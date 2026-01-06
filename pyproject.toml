@@ -1,9 +1,12 @@
 [project]
 name = "claude-aoc"
 version = "0.1.0"
-description = "Add your description here"
+description = "Advent of Code solver with Claude Code integration"
 requires-python = ">=3.13"
 dependencies = []
+
+[project.scripts]
+aoc = "aoc.cli:main"
 
 [dependency-groups]
 dev = [
@@ -11,6 +14,13 @@ dev = [
     "pytest>=9.0.2",
     "ruff>=0.14.10",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
 
 [tool.ruff]
 line-length = 88
@@ -54,6 +64,8 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D", "ANN", "S101"]  # Tests don't need docstrings/annotations, allow assert
+"src/aoc/http.py" = ["S310"]  # HTTP client intentionally makes web requests
 
 [tool.mypy]
 warn_unused_configs = true
