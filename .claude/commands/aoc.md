@@ -302,6 +302,13 @@ if __name__ == "__main__":
 - **Code Quality**: All solutions must have type annotations, docstrings, and pass ruff/mypy.
 - **Documentation**: Explain your approach in docstrings so others can understand your solution.
 - **Optimization**: Part 2 often requires algorithmic improvements, not just running the same code.
+- **NO CHEATING**: You are STRICTLY FORBIDDEN from searching for solutions online. This includes:
+  - DO NOT use WebSearch to look for Advent of Code solutions
+  - DO NOT search on r/adventofcode subreddit or any forum
+  - DO NOT look up solutions on GitHub, blogs, or solution repositories
+  - DO NOT use WebFetch to access solution websites
+  - You MUST solve the puzzle yourself using ONLY the problem description and examples provided
+  - The goal is to develop your own algorithmic solution, not to copy someone else's work
 
 ## Available Helper Functions
 
