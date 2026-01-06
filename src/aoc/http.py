@@ -1,8 +1,8 @@
 """HTTP client for interacting with Advent of Code."""
 
 import os
-import urllib.request
-from urllib.parse import urlencode
+
+import requests
 
 
 class AoCClient:
@@ -15,6 +15,11 @@ class AoCClient:
             "AOC_SESSION",
             "53616c7465645f5ff08e9d3be1bff143afa69b86a603a80b0f31d11da49204349d802958358b87ea910b02347ceafc4c55cd9f3e39dace82270c1696ce6d52a3",
         )
+        self.headers = {
+            "User-Agent": "github.com/simon/claude-aoc by simon@example.com",
+        }
+        self.cookies = {"session": self.session}
+        self.timeout = 30  # 30 second timeout for all requests
 
     def fetch_puzzle(self, year: int, day: int) -> str:
         """Fetch puzzle HTML.
@@ -28,15 +33,11 @@ class AoCClient:
 
         """
         url = f"https://adventofcode.com/{year}/day/{day}"
-        req = urllib.request.Request(url)
-        req.add_header("Cookie", f"session={self.session}")
-        req.add_header(
-            "User-Agent",
-            "github.com/simon/claude-aoc by simon@example.com",
+        response = requests.get(
+            url, headers=self.headers, cookies=self.cookies, timeout=self.timeout
         )
-
-        with urllib.request.urlopen(req) as response:
-            return response.read().decode("utf-8")
+        response.raise_for_status()
+        return response.text
 
     def fetch_input(self, year: int, day: int) -> str:
         """Fetch input data.
@@ -50,15 +51,11 @@ class AoCClient:
 
         """
         url = f"https://adventofcode.com/{year}/day/{day}/input"
-        req = urllib.request.Request(url)
-        req.add_header("Cookie", f"session={self.session}")
-        req.add_header(
-            "User-Agent",
-            "github.com/simon/claude-aoc by simon@example.com",
+        response = requests.get(
+            url, headers=self.headers, cookies=self.cookies, timeout=self.timeout
         )
-
-        with urllib.request.urlopen(req) as response:
-            return response.read().decode("utf-8")
+        response.raise_for_status()
+        return response.text
 
     def submit_answer(
         self,
@@ -80,15 +77,13 @@ class AoCClient:
 
         """
         url = f"https://adventofcode.com/{year}/day/{day}/answer"
-        data = urlencode({"level": str(part), "answer": str(answer)}).encode("utf-8")
-
-        req = urllib.request.Request(url, data=data, method="POST")
-        req.add_header("Cookie", f"session={self.session}")
-        req.add_header(
-            "User-Agent",
-            "github.com/simon/claude-aoc by simon@example.com",
+        data = {"level": str(part), "answer": str(answer)}
+        response = requests.post(
+            url,
+            headers=self.headers,
+            cookies=self.cookies,
+            data=data,
+            timeout=self.timeout,
         )
-        req.add_header("Content-Type", "application/x-www-form-urlencoded")
-
-        with urllib.request.urlopen(req) as response:
-            return response.read().decode("utf-8")
+        response.raise_for_status()
+        return response.text
