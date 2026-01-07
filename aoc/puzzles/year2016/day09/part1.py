@@ -3,7 +3,6 @@
 Calculate decompressed length of compressed file.
 """
 
-import re
 
 
 def decompress_length(compressed: str) -> int:

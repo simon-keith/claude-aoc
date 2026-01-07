@@ -4,7 +4,6 @@ Find 64th one-time pad key index using MD5 hashes.
 """
 
 import hashlib
-import re
 
 
 def get_hash(salt: str, index: int) -> str:
