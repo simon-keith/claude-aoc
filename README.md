@@ -20,18 +20,22 @@ An Advent of Code puzzle solver powered by Claude Code, featuring automated TDD 
    uv sync
    ```
 
-2. **Set your session cookie** (optional - already configured):
+2. **Set your session cookie** (required):
    ```bash
    export AOC_SESSION="your_session_cookie_here"
    ```
-
-   The session cookie is already hardcoded in `aoc/http.py`, but you can override it with the environment variable.
 
    To get your session cookie:
    - Log in to [adventofcode.com](https://adventofcode.com)
    - Open browser dev tools (F12)
    - Go to Application/Storage → Cookies
    - Copy the value of the `session` cookie
+
+   **Tip**: To persist the session cookie across terminal sessions, add it to your shell profile:
+   ```bash
+   # Add to ~/.bashrc, ~/.zshrc, or equivalent
+   export AOC_SESSION="your_session_cookie_here"
+   ```
 
 ## Usage
 

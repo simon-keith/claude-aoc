@@ -9,12 +9,19 @@ class AoCClient:
     """Client for fetching puzzles, inputs, and submitting answers."""
 
     def __init__(self) -> None:
-        """Initialize the client with session cookie."""
-        # User's session cookie (fallback to env var if set)
-        self.session = os.environ.get(
-            "AOC_SESSION",
-            "53616c7465645f5ff08e9d3be1bff143afa69b86a603a80b0f31d11da49204349d802958358b87ea910b02347ceafc4c55cd9f3e39dace82270c1696ce6d52a3",
-        )
+        """Initialize the client with session cookie from environment.
+
+        Raises:
+            ValueError: If AOC_SESSION environment variable is not set
+
+        """
+        self.session = os.environ.get("AOC_SESSION")
+        if not self.session:
+            raise ValueError(
+                "AOC_SESSION environment variable not set. "
+                "Get your session cookie from adventofcode.com and set it with: "
+                "export AOC_SESSION='your_session_cookie'"
+            )
         self.headers = {
             "User-Agent": "github.com/simon/claude-aoc by simon@example.com",
         }
