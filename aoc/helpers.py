@@ -42,7 +42,7 @@ def ensure_puzzle_dir(year: int, day: int) -> Path:
 
 
 def wipe_puzzle(year: int, day: int) -> None:
-    """Delete all puzzle files for fresh start.
+    """Delete all puzzle files and tests for fresh start.
 
     Args:
         year: Year of the puzzle
@@ -52,6 +52,11 @@ def wipe_puzzle(year: int, day: int) -> None:
     path = get_puzzle_dir(year, day)
     if path.exists():
         shutil.rmtree(path)
+
+    # Also delete the test file for this day
+    test_path = Path(__file__).parent.parent / "tests" / "puzzles" / f"test_{year}_day{day:02d}.py"
+    if test_path.exists():
+        test_path.unlink()
 
 
 def read_puzzle_input(year: int, day: int) -> str:
