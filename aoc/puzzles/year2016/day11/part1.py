@@ -17,17 +17,16 @@ class State(NamedTuple):
     items: tuple[tuple[int, int], ...]
 
 
-def parse_input(puzzle_input: str) -> State:  # noqa: C901
-    """Parse puzzle input into initial state.
+def parse_floor_items(lines: list[str]) -> dict[int, list[tuple[str, str]]]:
+    """Parse items on each floor from input lines.
 
     Args:
-        puzzle_input: Raw puzzle input string
+        lines: Input lines describing floor contents
 
     Returns:
-        Initial state with elevator at floor 0 and item positions
+        Dict mapping floor index to list of (element, type) tuples
 
     """
-    lines = puzzle_input.strip().split("\n")
     floors: dict[int, list[tuple[str, str]]] = {0: [], 1: [], 2: [], 3: []}
 
     for floor_idx, line in enumerate(lines):
@@ -41,6 +40,21 @@ def parse_input(puzzle_input: str) -> State:  # noqa: C901
         for elem in microchips:
             floors[floor_idx].append((elem, "M"))
 
+    return floors
+
+
+def build_item_positions(
+    floors: dict[int, list[tuple[str, str]]]
+) -> list[tuple[int, int]]:
+    """Build item positions from floor data.
+
+    Args:
+        floors: Dict mapping floor index to list of (element, type) tuples
+
+    Returns:
+        List of (gen_floor, chip_floor) for each element
+
+    """
     # Build element list
     elements = set()
     for floor_items in floors.values():
@@ -62,6 +76,22 @@ def parse_input(puzzle_input: str) -> State:  # noqa: C901
                         chip_floor = floor_idx
         items.append((gen_floor, chip_floor))
 
+    return items
+
+
+def parse_input(puzzle_input: str) -> State:
+    """Parse puzzle input into initial state.
+
+    Args:
+        puzzle_input: Raw puzzle input string
+
+    Returns:
+        Initial state with elevator at floor 0 and item positions
+
+    """
+    lines = puzzle_input.strip().split("\n")
+    floors = parse_floor_items(lines)
+    items = build_item_positions(floors)
     return State(elevator=0, items=tuple(items))
 
 
@@ -110,7 +140,55 @@ def is_valid_state(state: State) -> bool:
     return True
 
 
-def get_next_states(state: State) -> list[State]:  # noqa: C901
+def get_items_on_floor(
+    state: State, floor: int
+) -> list[tuple[str, int]]:
+    """Get all items on a specific floor.
+
+    Args:
+        state: Current state
+        floor: Floor number
+
+    Returns:
+        List of (item_type, elem_idx) tuples for items on this floor
+
+    """
+    items_on_floor = []
+    for elem_idx, (gen_floor, chip_floor) in enumerate(state.items):
+        if gen_floor == floor:
+            items_on_floor.append(("G", elem_idx))
+        if chip_floor == floor:
+            items_on_floor.append(("M", elem_idx))
+    return items_on_floor
+
+
+def create_new_state(
+    state: State,
+    items_to_move: tuple[tuple[str, int], ...],
+    new_floor: int,
+) -> State:
+    """Create a new state by moving items to a new floor.
+
+    Args:
+        state: Current state
+        items_to_move: Items to move (item_type, elem_idx)
+        new_floor: Destination floor
+
+    Returns:
+        New state with items moved
+
+    """
+    new_items = list(state.items)
+    for item_type, elem_idx in items_to_move:
+        gen_floor, chip_floor = new_items[elem_idx]
+        if item_type == "G":
+            new_items[elem_idx] = (new_floor, chip_floor)
+        else:
+            new_items[elem_idx] = (gen_floor, new_floor)
+    return State(elevator=new_floor, items=tuple(new_items))
+
+
+def get_next_states(state: State) -> list[State]:
     """Generate all valid next states from the current state.
 
     Args:
@@ -122,14 +200,7 @@ def get_next_states(state: State) -> list[State]:  # noqa: C901
     """
     next_states = []
     current_floor = state.elevator
-
-    # Get items on current floor
-    items_on_floor = []
-    for elem_idx, (gen_floor, chip_floor) in enumerate(state.items):
-        if gen_floor == current_floor:
-            items_on_floor.append(("G", elem_idx))
-        if chip_floor == current_floor:
-            items_on_floor.append(("M", elem_idx))
+    items_on_floor = get_items_on_floor(state, current_floor)
 
     # Try moving 1 or 2 items
     for num_items in [1, 2]:
@@ -140,16 +211,7 @@ def get_next_states(state: State) -> list[State]:  # noqa: C901
                 if new_floor < 0 or new_floor > 3:
                     continue
 
-                # Create new state
-                new_items = list(state.items)
-                for item_type, elem_idx in items_to_move:
-                    gen_floor, chip_floor = new_items[elem_idx]
-                    if item_type == "G":
-                        new_items[elem_idx] = (new_floor, chip_floor)
-                    else:
-                        new_items[elem_idx] = (gen_floor, new_floor)
-
-                new_state = State(elevator=new_floor, items=tuple(new_items))
+                new_state = create_new_state(state, items_to_move, new_floor)
 
                 if is_valid_state(new_state):
                     next_states.append(new_state)
