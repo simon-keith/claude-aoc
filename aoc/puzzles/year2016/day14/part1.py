@@ -17,7 +17,7 @@ def get_hash(salt: str, index: int) -> str:
         MD5 hash as hexadecimal string
 
     """
-    return hashlib.md5(f"{salt}{index}".encode()).hexdigest()
+    return hashlib.md5(f"{salt}{index}".encode(), usedforsecurity=False).hexdigest()
 
 
 def find_triplet(hash_str: str) -> str | None:

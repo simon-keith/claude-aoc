@@ -22,12 +22,14 @@ def solve(puzzle_input: str) -> str:
 
     """
     door_id = puzzle_input.strip()
-    password = []
+    password: list[str] = []
     index = 0
 
     while len(password) < 8:
         hash_input = f"{door_id}{index}"
-        hash_result = hashlib.md5(hash_input.encode()).hexdigest()
+        hash_result = hashlib.md5(
+            hash_input.encode(), usedforsecurity=False
+        ).hexdigest()
 
         if hash_result.startswith("00000"):
             password.append(hash_result[5])

@@ -13,10 +13,11 @@ class State(NamedTuple):
     """Represents a state in the search space."""
 
     elevator: int  # Current floor (0-3 for floors 1-4)
-    items: tuple[tuple[int, int], ...]  # (generator_floor, microchip_floor) for each element
+    # (generator_floor, microchip_floor) for each element
+    items: tuple[tuple[int, int], ...]
 
 
-def parse_input(puzzle_input: str) -> State:
+def parse_input(puzzle_input: str) -> State:  # noqa: C901
     """Parse puzzle input into initial state.
 
     Args:
@@ -80,12 +81,7 @@ def is_valid_floor(generators: set[int], microchips: set[int]) -> bool:
     if not generators:
         return True  # No generators means all chips are safe
 
-    for chip_elem in microchips:
-        if chip_elem not in generators:
-            # Chip without its generator and there's at least one other generator
-            return False
-
-    return True
+    return all(chip_elem in generators for chip_elem in microchips)
 
 
 def is_valid_state(state: State) -> bool:
@@ -114,7 +110,7 @@ def is_valid_state(state: State) -> bool:
     return True
 
 
-def get_next_states(state: State) -> list[State]:
+def get_next_states(state: State) -> list[State]:  # noqa: C901
     """Generate all valid next states from the current state.
 
     Args:

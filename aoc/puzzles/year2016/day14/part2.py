@@ -19,9 +19,9 @@ def get_stretched_hash(salt: str, index: int) -> str:
         Stretched MD5 hash as hexadecimal string
 
     """
-    hash_str = hashlib.md5(f"{salt}{index}".encode()).hexdigest()
+    hash_str = hashlib.md5(f"{salt}{index}".encode(), usedforsecurity=False).hexdigest()
     for _ in range(2016):
-        hash_str = hashlib.md5(hash_str.encode()).hexdigest()
+        hash_str = hashlib.md5(hash_str.encode(), usedforsecurity=False).hexdigest()
     return hash_str
 
 

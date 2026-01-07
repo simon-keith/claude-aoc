@@ -19,7 +19,7 @@ def get_open_doors(passcode: str, path: str) -> str:
 
     """
     hash_input = passcode + path
-    md5_hash = hashlib.md5(hash_input.encode()).hexdigest()  # noqa: S324
+    md5_hash = hashlib.md5(hash_input.encode(), usedforsecurity=False).hexdigest()
     open_chars = 'bcdef'
 
     open_doors = ''

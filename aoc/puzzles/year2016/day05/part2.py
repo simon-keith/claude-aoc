@@ -24,13 +24,15 @@ def solve(puzzle_input: str) -> str:
 
     """
     door_id = puzzle_input.strip()
-    password = [None] * 8
+    password: list[str | None] = [None] * 8
     index = 0
     filled_positions = 0
 
     while filled_positions < 8:
         hash_input = f"{door_id}{index}"
-        hash_result = hashlib.md5(hash_input.encode()).hexdigest()
+        hash_result = hashlib.md5(
+            hash_input.encode(), usedforsecurity=False
+        ).hexdigest()
 
         if hash_result.startswith("00000"):
             position_char = hash_result[5]
@@ -44,7 +46,7 @@ def solve(puzzle_input: str) -> str:
 
         index += 1
 
-    return "".join(password)
+    return "".join(c for c in password if c is not None)
 
 
 if __name__ == "__main__":
