@@ -1,6 +1,6 @@
 """Tests for Advent of Code 2016 Day 8."""
 
-from aoc.puzzles.year2016.day08 import part1
+from aoc.puzzles.year2016.day08 import part1, part2
 
 
 class TestPart1:
@@ -32,5 +32,21 @@ class TestPart1:
         assert screen.pixels[1][:7] == [True, False, True, False, False, False, False]
         assert screen.pixels[2][:7] == [False, True, False, False, False, False, False]
 
-        # Should have 6 pixels lit
+        # Final count
         assert screen.count_lit() == 6
+
+
+class TestPart2:
+    def test_example_renders_correctly(self):
+        """Test that rendering works correctly."""
+        puzzle_input = """rect 3x2
+rotate column x=1 by 1
+rotate row y=0 by 4
+rotate column x=1 by 1"""
+        result = part2.solve(puzzle_input)
+        # Should return ASCII art representation - verify it has newlines and '#'/'.' chars
+        assert "\n" in result
+        assert "#" in result
+        assert "." in result
+        # Verify it has 6 lit pixels
+        assert result.count("#") == 6
