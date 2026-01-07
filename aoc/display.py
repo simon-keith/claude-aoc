@@ -75,8 +75,84 @@ def run_year(year: int) -> list[SolveResult]:
     return results
 
 
+def _format_answer(answer: int | str | None) -> str:
+    """Format an answer for display, wrapping multiline content in code blocks.
+
+    Args:
+        answer: Answer (int, str, or None)
+
+    Returns:
+        Formatted answer string
+
+    """
+    if answer is None:
+        return "-"
+
+    ans_str = str(answer)
+    if "\n" in ans_str:
+        return f"```\n{ans_str}\n```"
+    return ans_str
+
+
+def _calculate_column_widths(
+    rows: list[dict[str, str]], headers: list[str]
+) -> dict[str, int]:
+    """Calculate column widths based on content.
+
+    Args:
+        rows: List of row dictionaries
+        headers: List of header names
+
+    Returns:
+        Dictionary mapping header to column width
+
+    """
+    col_widths = {header: len(header) for header in headers}
+
+    for row in rows:
+        for header in headers:
+            content = row[header]
+            if "\n" in content:
+                max_line_width = max(len(line) for line in content.split("\n"))
+                col_widths[header] = max(col_widths[header], max_line_width)
+            else:
+                col_widths[header] = max(col_widths[header], len(content))
+
+    return col_widths
+
+
+def _print_table_row(
+    row: dict[str, str], headers: list[str], col_widths: dict[str, int]
+) -> None:
+    """Print a single table row, handling multiline content.
+
+    Args:
+        row: Row data dictionary
+        headers: List of header names
+        col_widths: Column width dictionary
+
+    """
+    # Split multiline content
+    row_lines = {header: row[header].split("\n") for header in headers}
+    max_lines = max(len(lines) for lines in row_lines.values())
+
+    # Print each line of the row
+    for i in range(max_lines):
+        line_parts = []
+        for header in headers:
+            if i < len(row_lines[header]):
+                content = row_lines[header][i].ljust(col_widths[header])
+            else:
+                content = " " * col_widths[header]
+            line_parts.append(content)
+        print("| " + " | ".join(line_parts) + " |")
+
+
 def display_result_table(results: list[SolveResult]) -> None:
-    """Display results in formatted table.
+    """Display results in formatted markdown table.
+
+    Automatically adjusts column widths to fit content.
+    Handles multiline answers (e.g., ASCII art) by displaying them in code blocks.
 
     Args:
         results: List of solve results to display
@@ -86,24 +162,36 @@ def display_result_table(results: list[SolveResult]) -> None:
         return
 
     year = results[0].year
-    print(f"\n┌{'─' * 78}┐")
-    print(f"│ Year: {year}{' ' * (72 - len(str(year)))}│")
-    print(f"├{'─' * 5}┬{'─' * 17}┬{'─' * 17}┬{'─' * 17}┬{'─' * 17}┤")
-    print(
-        f"│ {'Day':^3} │ {'Part 1 Answer':^15} │ {'Part 2 Answer':^15} │ "
-        f"{'Part 1 Time':^15} │ {'Part 2 Time':^15} │"
-    )
-    print(f"├{'─' * 5}┼{'─' * 17}┼{'─' * 17}┼{'─' * 17}┼{'─' * 17}┤")
+    print(f"\n# Advent of Code {year} Results\n")
+
+    # Prepare table data
+    headers = ["Day", "Part 1 Answer", "Part 2 Answer", "Part 1 Time", "Part 2 Time"]
+    rows = []
 
     for result in results:
-        p1_ans = str(result.part1_answer) if result.part1_answer is not None else "-"
-        p2_ans = str(result.part2_answer) if result.part2_answer is not None else "-"
         p1_time = f"{result.part1_time:.3f}s" if result.part1_time > 0 else "-"
         p2_time = f"{result.part2_time:.3f}s" if result.part2_time > 0 else "-"
 
-        print(
-            f"│ {result.day:3d} │ {p1_ans:^15} │ {p2_ans:^15} │ "
-            f"{p1_time:^15} │ {p2_time:^15} │"
-        )
+        rows.append({
+            "Day": str(result.day),
+            "Part 1 Answer": _format_answer(result.part1_answer),
+            "Part 2 Answer": _format_answer(result.part2_answer),
+            "Part 1 Time": p1_time,
+            "Part 2 Time": p2_time,
+        })
 
-    print(f"└{'─' * 5}┴{'─' * 17}┴{'─' * 17}┴{'─' * 17}┴{'─' * 17}┘\n")
+    # Calculate column widths and print table
+    col_widths = _calculate_column_widths(rows, headers)
+
+    header_row = "| " + " | ".join(
+        header.ljust(col_widths[header]) for header in headers
+    ) + " |"
+    separator = "| " + " | ".join("-" * col_widths[header] for header in headers) + " |"
+
+    print(header_row)
+    print(separator)
+
+    for row in rows:
+        _print_table_row(row, headers, col_widths)
+
+    print()
