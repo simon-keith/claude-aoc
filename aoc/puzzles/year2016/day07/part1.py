@@ -54,11 +54,7 @@ def supports_tls(ip_address: str) -> bool:
             return False
 
     # Check if any ABBA exists outside brackets (qualifies)
-    for part in parts_outside:
-        if has_abba(part):
-            return True
-
-    return False
+    return any(has_abba(part) for part in parts_outside)
 
 
 def solve(puzzle_input: str) -> str:

@@ -54,7 +54,9 @@ def wipe_puzzle(year: int, day: int) -> None:
         shutil.rmtree(path)
 
     # Also delete the test file for this day
-    test_path = Path(__file__).parent.parent / "tests" / "puzzles" / f"test_{year}_day{day:02d}.py"
+    test_path = (
+        Path(__file__).parent.parent / "tests" / "puzzles" / f"test_{year}_day{day:02d}.py"
+    )
     if test_path.exists():
         test_path.unlink()
 

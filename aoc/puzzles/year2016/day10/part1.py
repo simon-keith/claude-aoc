@@ -17,7 +17,9 @@ class BotRule(TypedDict):
     high_id: int
 
 
-def parse_instructions(puzzle_input: str) -> tuple[dict[int, BotRule], list[tuple[int, int]]]:
+def parse_instructions(
+    puzzle_input: str,
+) -> tuple[dict[int, BotRule], list[tuple[int, int]]]:
     """Parse bot instructions and initial chip assignments.
 
     Args:
@@ -39,16 +41,20 @@ def parse_instructions(puzzle_input: str) -> tuple[dict[int, BotRule], list[tupl
                 value, bot_id = int(match.group(1)), int(match.group(2))
                 initial_assignments.append((value, bot_id))
         elif line.startswith("bot"):
-            match = re.match(
-                r"bot (\d+) gives low to (bot|output) (\d+) and high to (bot|output) (\d+)",
-                line,
+            pattern = (
+                r"bot (\d+) gives low to (bot|output) (\d+) "
+                r"and high to (bot|output) (\d+)"
             )
+            match = re.match(pattern, line)
             if match:
                 bot_id = int(match.group(1))
                 low_type, low_id = match.group(2), int(match.group(3))
                 high_type, high_id = match.group(4), int(match.group(5))
                 bot_rules[bot_id] = BotRule(
-                    low_type=low_type, low_id=low_id, high_type=high_type, high_id=high_id
+                    low_type=low_type,
+                    low_id=low_id,
+                    high_type=high_type,
+                    high_id=high_id,
                 )
 
     return bot_rules, initial_assignments

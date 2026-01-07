@@ -23,8 +23,7 @@ def is_open_space(x: int, y: int, favorite: int) -> bool:
 
     value = x * x + 3 * x + 2 * x * y + y + y * y + favorite
     # Count 1 bits
-    bits = bin(value).count("1")
-    return bits % 2 == 0
+    return value.bit_count() % 2 == 0
 
 
 def find_shortest_path(favorite: int, target_x: int, target_y: int) -> int:
