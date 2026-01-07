@@ -305,12 +305,12 @@ For a screen displaying the letters "ABCD" in ASCII art:
 ```python
 def solve(puzzle_input: str) -> str:
     # ... simulate display ...
-    return """.##..###...##..####.
+    return """.##..###...##..###..
+#..#.#..#.#..#.#..#.
+#..#.###..#....#..#.
+####.#..#.#....###..
 #..#.#..#.#..#.#....
-#..#.###..#....###..
-####.#..#.#....#....
-#..#.#..#.#..#.#....
-#..#.###...##..####."""
+#..#.###...##..#...."""
 ```
 
 You would visually read this as "ABCD" and submit that as the answer.
