@@ -272,3 +272,50 @@ If you encountered workflow issues, helper bugs, unclear instructions, or opport
 - **TDD always** - validate examples before real input (saves submission attempts)
 - **No cheating** - solve yourself, don't search for solutions online
 - **No git commits** - user will commit when ready
+
+## Handling Visual/ASCII Art Outputs
+
+Some AoC puzzles (e.g., 2016 Day 8 Part 2) produce visual outputs as ASCII art that need manual interpretation to determine the answer.
+
+### Recognition
+A puzzle requires visual interpretation when:
+- The output is a simulated display/screen (pixels, LCD, CRT, etc.)
+- You need to "read" letters or numbers from the visual output
+- The expected answer is text displayed as ASCII art, not a computed number
+
+### Approach
+When encountering these puzzles:
+
+1. **Return the ASCII art directly** from the solve function:
+   ```python
+   def solve(puzzle_input: str) -> str:
+       # ... simulate screen/display ...
+       rendered = render_screen(screen)
+
+       # Return the ASCII art itself
+       return rendered
+   ```
+
+2. **Manually interpret the ASCII art** by visually reading the letters/numbers from the output
+
+3. **Submit the interpreted answer** using the submission command with the actual text you read
+
+### Example
+For a screen displaying the letters "ABCD" in ASCII art:
+```python
+def solve(puzzle_input: str) -> str:
+    # ... simulate display ...
+    return """.##..###...##..####.
+#..#.#..#.#..#.#....
+#..#.###..#....###..
+####.#..#.#....#....
+#..#.#..#.#..#.#....
+#..#.###...##..####."""
+```
+
+You would visually read this as "ABCD" and submit that as the answer.
+
+### Notes
+- Different puzzles may use different characters (not just `#` and `.`)
+- Letters and numbers may appear in different sizes/formats
+- The `solve()` function returns the ASCII art itself (multiline string)
