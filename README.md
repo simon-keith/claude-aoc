@@ -25,7 +25,7 @@ An Advent of Code puzzle solver powered by Claude Code, featuring automated TDD 
    export AOC_SESSION="your_session_cookie_here"
    ```
 
-   The session cookie is already hardcoded in `src/aoc/http.py`, but you can override it with the environment variable.
+   The session cookie is already hardcoded in `aoc/http.py`, but you can override it with the environment variable.
 
    To get your session cookie:
    - Log in to [adventofcode.com](https://adventofcode.com)
@@ -40,11 +40,11 @@ An Advent of Code puzzle solver powered by Claude Code, featuring automated TDD 
 Use the `/aoc` slash command in Claude Code:
 
 ```bash
-/aoc 2015 8
+/aoc 2016 8
 ```
 
 This will:
-1. Wipe any existing solution (clean slate)
+1. Wipe any existing solution and tests (clean slate)
 2. Download the puzzle and input
 3. Interpret the puzzle naturally
 4. Generate solution templates with proper structure
@@ -53,29 +53,44 @@ This will:
 7. Submit answers and handle responses
 8. Generate markdown documentation
 9. Display results in a formatted table
-10. Commit everything to git
+
+**Note**: The workflow does NOT automatically commit to git. You should review and commit changes when ready.
 
 ### Run Tests
 
 ```bash
 # All tests
-pytest
+uv run pytest
 
 # Specific day
-pytest tests/puzzles/test_2015_day08.py
+uv run pytest tests/puzzles/test_2016_day08.py
 
 # Just puzzle tests
-pytest tests/puzzles/
+uv run pytest tests/puzzles/
+
+# With verbose output
+uv run pytest tests/puzzles/ -v
 ```
 
 ### Run a Solution Manually
 
 ```bash
 # Run part 1
-python puzzles/2015/day08/part1.py
+uv run python aoc/puzzles/year2016/day08/part1.py
 
 # Run part 2
-python puzzles/2015/day08/part2.py
+uv run python aoc/puzzles/year2016/day08/part2.py
+```
+
+### Display Results for a Year
+
+```python
+# Show all completed puzzles for a year with timing
+uv run python -c "
+from aoc.display import run_year, display_result_table
+results = run_year(2016)
+display_result_table(results)
+"
 ```
 
 ## Project Structure
@@ -84,38 +99,40 @@ python puzzles/2015/day08/part2.py
 claude-aoc/
 ├── .claude/
 │   └── commands/
-│       └── aoc.md                   # Slash command with agent workflow
-├── src/
-│   └── aoc/
-│       ├── types.py                 # SolveResult dataclass
-│       ├── http.py                  # HTTP client for AoC API
-│       ├── helpers.py               # Utility functions
-│       └── cli.py                   # CLI interface
-├── puzzles/
-│   └── {year}/
-│       └── day{day:02d}/
-│           ├── input.txt            # Puzzle input (committed)
-│           ├── part1.py             # Part 1 solution
-│           ├── part2.py             # Part 2 solution
-│           └── puzzle.md            # Full puzzle documentation
+│       └── aoc.md                          # Slash command with agent workflow
+├── aoc/                                     # Main package (no longer in src/)
+│   ├── types.py                            # SolveResult dataclass
+│   ├── http.py                             # HTTP client for AoC API
+│   ├── helpers.py                          # Utility functions (wipe_puzzle, read_input, etc.)
+│   ├── display.py                          # Results table formatting with markdown
+│   └── puzzles/
+│       └── year{year}/
+│           └── day{day:02d}/
+│               ├── __init__.py             # Optional package marker
+│               ├── input.txt               # Puzzle input (committed)
+│               ├── part1.py                # Part 1 solution
+│               ├── part2.py                # Part 2 solution
+│               └── puzzle.md               # Full puzzle documentation
 └── tests/
     └── puzzles/
-        └── test_{year}_day{day:02d}.py
+        └── test_{year}_day{day:02d}.py     # Pytest tests for both parts
 ```
 
 ## How It Works
 
-The `/aoc` command triggers a Claude Code agent that follows a comprehensive workflow:
+The `/aoc` command triggers a Claude Code agent that follows a comprehensive workflow (documented in [.claude/commands/aoc.md](.claude/commands/aoc.md)):
 
-1. **Clean Slate**: Deletes existing puzzle directory for fresh start
+1. **Clean Slate**: Deletes existing puzzle directory and test files for fresh start
 2. **Download**: Fetches puzzle HTML and input data
 3. **Interpret**: Uses LLM understanding to extract problem details and examples
-4. **Generate**: Creates properly structured solution templates
-5. **Test**: Writes pytest tests based on examples
+4. **Generate**: Creates properly structured solution templates in `aoc/puzzles/year{year}/day{day:02d}/`
+5. **Test**: Writes pytest tests in `tests/puzzles/` based on examples
 6. **Implement**: Solves using TDD methodology
 7. **Submit**: Posts answers and interprets responses naturally
-8. **Document**: Generates markdown with full puzzle and solutions
-9. **Display**: Shows results table with answers and timing
+8. **Document**: Generates `puzzle.md` with full puzzle description
+9. **Display**: Shows results table with answers and timing (optional)
+
+**Important**: The workflow follows a strict anti-cheating policy - no searching for solutions online or looking at other people's code.
 
 ### TDD Methodology
 
@@ -145,12 +162,22 @@ The agent interprets submission responses naturally:
 - ⏸️ **"You gave an answer too recently"** → Wait the specified time
 - ❌ **"too high" / "too low"** → Add constraints, retry
 
+## Special Cases
+
+### Visual/ASCII Art Puzzles
+
+Some puzzles (e.g., 2016 Day 8) produce visual outputs that need manual interpretation:
+- Part 2 returns ASCII art directly as a multiline string
+- The answer must be read visually from the output
+- See [Visual/ASCII Art Handling](.claude/commands/aoc.md#handling-visualascii-art-outputs) in `aoc.md` for details
+
 ## Tips
 
 - **Trust the Examples**: Always make example tests pass before trying real input
 - **Part 2 Optimization**: Often needs a completely different algorithm
 - **Natural Interpretation**: The agent reads HTML naturally - no need for rigid parsers
-- **Clean Slate**: Re-running wipes everything, so you can try different approaches
+- **Clean Slate**: Re-running wipes both puzzle files and tests for fresh start
+- **Test Coverage**: Ensure both Part 1 and Part 2 have tests before submitting
 
 ## License
 
